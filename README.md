@@ -1,6 +1,6 @@
 # 🎵 Musicly
 
-[![CI](https://github.com/R0b3r7R0gu3/musicly/actions/workflows/ci.yml/badge.svg)](https://github.com/R0b3r7R0gu3/musicly/actions/workflows/ci.yml)
+[![CI](https://github.com/R0b3r7R0gu3/Musicly/actions/workflows/ci.yml/badge.svg)](https://github.com/R0b3r7R0gu3/Musicly/actions/workflows/ci.yml)
 
 Un'app di streaming musicale in stile Spotify, **installabile** su telefono e computer (PWA). Costruita con HTML, CSS e JavaScript puro: nessuna dipendenza, nessun build.
 
@@ -31,8 +31,8 @@ Il workflow `.github/workflows/pages.yml` pubblica la cartella `src/` a ogni pus
 ## Avvio in locale
 
 ```bash
-git clone https://github.com/R0b3r7R0gu3/musicly.git
-cd musicly
+git clone https://github.com/R0b3r7R0gu3/Musicly.git
+cd Musicly
 npm start
 ```
 
