@@ -1,0 +1,161 @@
+:root {
+  --bg: #121212;
+  --panel: #181818;
+  --panel-2: #282828;
+  --text: #ffffff;
+  --muted: #b3b3b3;
+  --accent: #1db954;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  height: calc(100vh - 90px);
+}
+
+.sidebar {
+  background: #000;
+  padding: 20px 16px;
+  overflow-y: auto;
+}
+
+.logo { font-size: 1.3rem; margin: 0 0 20px; }
+
+.nav-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 6px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.nav-btn:hover, .nav-btn.active { color: var(--text); background: var(--panel-2); }
+
+.playlists-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 24px 0 8px;
+}
+.playlists-head h2 { font-size: 0.9rem; color: var(--muted); margin: 0; text-transform: uppercase; letter-spacing: 0.05em; }
+.playlists-head button { font-size: 1.2rem; color: var(--muted); }
+.playlists-head button:hover { color: var(--text); }
+
+#playlist-list { list-style: none; padding: 0; margin: 0; }
+#playlist-list li {
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+}
+#playlist-list li:hover, #playlist-list li.active { color: var(--text); background: var(--panel-2); }
+#playlist-list .del { opacity: 0; }
+#playlist-list li:hover .del { opacity: 1; }
+
+.main {
+  background: linear-gradient(var(--panel-2), var(--bg) 220px);
+  padding: 20px 28px;
+  overflow-y: auto;
+}
+
+#search {
+  width: 100%;
+  max-width: 420px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  background: #fff;
+  color: #000;
+  font-size: 0.95rem;
+}
+
+.track-list { list-style: none; padding: 0; margin: 0; }
+
+.track {
+  display: grid;
+  grid-template-columns: 44px 1fr auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.track:hover { background: rgba(255, 255, 255, 0.08); }
+.track.playing .t-title { color: var(--accent); }
+
+.t-cover { width: 44px; height: 44px; border-radius: 4px; }
+.t-title { font-weight: 600; }
+.t-meta { color: var(--muted); font-size: 0.85rem; }
+
+.track button { color: var(--muted); font-size: 1.1rem; padding: 4px 8px; }
+.track button:hover { color: var(--text); }
+.track button.on { color: var(--accent); }
+
+.empty { color: var(--muted); padding: 20px 0; }
+
+.player {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: 90px;
+  background: var(--panel);
+  border-top: 1px solid #282828;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+  padding: 0 16px;
+  gap: 16px;
+}
+
+.now { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.cover { width: 56px; height: 56px; border-radius: 4px; background: var(--panel-2); flex: none; }
+.now-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.now-artist { color: var(--muted); font-size: 0.85rem; }
+
+.controls { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.buttons { display: flex; align-items: center; gap: 16px; }
+.buttons button { font-size: 1.1rem; color: var(--muted); }
+.buttons button:hover, .buttons button.on { color: var(--text); }
+.buttons button.on { color: var(--accent); }
+.buttons .play {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: #fff;
+  color: #000;
+  font-size: 1rem;
+}
+.buttons .play:hover { transform: scale(1.06); color: #000; }
+
+.progress { display: flex; align-items: center; gap: 8px; width: 100%; max-width: 560px; font-size: 0.75rem; color: var(--muted); }
+.progress input { flex: 1; }
+
+input[type="range"] { accent-color: var(--accent); }
+
+.volume { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .player { grid-template-columns: 1fr; height: auto; padding: 10px 16px; }
+  .layout { height: calc(100vh - 150px); }
+  .volume { display: none; }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "musicly",
+  "version": "0.1.0",
+  "description": "Un'app di streaming musicale in stile Spotify con HTML, CSS e JavaScript puro",
+  "scripts": {
+    "start": "npx --yes serve src -l 3000"
+  },
+  "keywords": ["music", "player", "spotify-clone", "playlist"],
+  "author": "Robert",
+  "license": "MIT"
+}

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Musicly</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <h1 class="logo">🎵 Musicly</h1>
+      <nav>
+        <button class="nav-btn active" data-view="library">Libreria</button>
+        <button class="nav-btn" data-view="favorites">Preferiti ♥</button>
+      </nav>
+      <div class="playlists-head">
+        <h2>Playlist</h2>
+        <button id="new-playlist" title="Nuova playlist">＋</button>
+      </div>
+      <ul id="playlist-list"></ul>
+    </aside>
+
+    <main class="main">
+      <input id="search" type="search" placeholder="Cerca brani, artisti, album…" autocomplete="off">
+      <h2 id="view-title">Libreria</h2>
+      <ul id="track-list" class="track-list"></ul>
+    </main>
+  </div>
+
+  <footer class="player">
+    <div class="now">
+      <div id="cover" class="cover"></div>
+      <div>
+        <div id="now-title" class="now-title">Nessun brano</div>
+        <div id="now-artist" class="now-artist">—</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="buttons">
+        <button id="shuffle" title="Shuffle">🔀</button>
+        <button id="prev" title="Precedente">⏮</button>
+        <button id="play" class="play" title="Play/Pausa">▶</button>
+        <button id="next" title="Successivo">⏭</button>
+        <button id="repeat" title="Repeat">🔁</button>
+      </div>
+      <div class="progress">
+        <span id="current">0:00</span>
+        <input id="seek" type="range" min="0" max="100" value="0" step="0.1">
+        <span id="duration">0:00</span>
+      </div>
+    </div>
+
+    <div class="volume">
+      🔊 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.8">
+    </div>
+  </footer>
+
+  <audio id="audio" preload="metadata"></audio>
+  <script src="tracks.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
