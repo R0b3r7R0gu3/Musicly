@@ -26,7 +26,7 @@ Offline funziona l'interfaccia; i brani richiedono la connessione, perché non v
 
 ### Pubblicarla online (GitHub Pages)
 
-Il workflow `.github/workflows/pages.yml` pubblica la cartella `src/` a ogni push su `main`. Basta attivare Pages una volta: **Settings → Pages → Source: GitHub Actions**. L'app sarà su `https://<utente>.github.io/musicly/`.
+Il workflow `.github/workflows/pages.yml` pubblica la cartella `src/` a ogni push su `main`. Basta attivare Pages una volta: **Settings → Pages → Source: GitHub Actions**. L'app sarà su `https://<utente>.github.io/Musicly/`.
 
 ## Avvio in locale
 
