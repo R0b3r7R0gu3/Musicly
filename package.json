@@ -4,7 +4,7 @@
   "description": "Un'app di streaming musicale installabile (PWA) in stile Spotify, con HTML, CSS e JavaScript puro",
   "scripts": {
     "start": "npx --yes serve src -l 3000",
-    "test": "node --test \"test/*.test.js\"",
+    "test": "node --test",
     "icons": "python3 scripts/make-icons.py"
   },
   "engines": { "node": ">=20" },
