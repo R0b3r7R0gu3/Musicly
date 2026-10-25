@@ -1,11 +1,14 @@
 {
   "name": "musicly",
-  "version": "0.1.0",
-  "description": "Un'app di streaming musicale in stile Spotify con HTML, CSS e JavaScript puro",
+  "version": "0.2.0",
+  "description": "Un'app di streaming musicale installabile (PWA) in stile Spotify, con HTML, CSS e JavaScript puro",
   "scripts": {
-    "start": "npx --yes serve src -l 3000"
+    "start": "npx --yes serve src -l 3000",
+    "test": "node --test \"test/*.test.js\"",
+    "icons": "python3 scripts/make-icons.py"
   },
-  "keywords": ["music", "player", "spotify-clone", "playlist"],
+  "engines": { "node": ">=20" },
+  "keywords": ["music", "player", "pwa", "spotify-clone", "playlist"],
   "author": "Robert",
   "license": "MIT"
 }

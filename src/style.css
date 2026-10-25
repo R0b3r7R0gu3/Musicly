@@ -159,3 +159,29 @@ input[type="range"] { accent-color: var(--accent); }
   .layout { height: calc(100vh - 150px); }
   .volume { display: none; }
 }
+
+.install-btn {
+  margin-top: 24px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+}
+.install-btn:hover { filter: brightness(1.1); }
+.install-btn[hidden] { display: none; }
+
+.offline-banner {
+  display: none;
+  margin-bottom: 12px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: #5a3b00;
+  color: #ffd27a;
+  font-size: 0.85rem;
+}
+body.offline .offline-banner { display: block; }
+
+/* Compatibile con notch e barre di sistema quando è installata */
+.player { padding-bottom: env(safe-area-inset-bottom); }

@@ -1,4 +1,5 @@
 (() => {
+  const L = MusiclyLib;
   const $ = (id) => document.getElementById(id);
   const audio = $("audio");
 
@@ -14,7 +15,7 @@
   const state = {
     view: "library",          // "library" | "favorites" | "pl:<id>"
     query: "",
-    queue: [],                // brani della vista corrente
+    queue: [],                // brani della lista da cui è partita la riproduzione
     index: -1,
     shuffle: false,
     repeat: false,
@@ -22,30 +23,16 @@
     playlists: load("musicly.playlists", [])   // [{id, name, trackIds: []}]
   };
 
-  const byId = (id) => TRACKS.find((t) => t.id === id);
-  const fmt = (s) => {
-    if (!isFinite(s)) return "0:00";
-    const m = Math.floor(s / 60);
-    return `${m}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
-  };
+  const currentTracks = () =>
+    L.tracksForView({
+      view: state.view,
+      tracks: TRACKS,
+      favorites: state.favorites,
+      playlists: state.playlists,
+      query: state.query
+    });
 
-  // ---------- Viste ----------
-  function currentTracks() {
-    let list = TRACKS;
-    if (state.view === "favorites") {
-      list = TRACKS.filter((t) => state.favorites.includes(t.id));
-    } else if (state.view.startsWith("pl:")) {
-      const pl = state.playlists.find((p) => p.id === state.view.slice(3));
-      list = pl ? pl.trackIds.map(byId).filter(Boolean) : [];
-    }
-    const q = state.query.trim().toLowerCase();
-    if (q) {
-      list = list.filter((t) =>
-        [t.title, t.artist, t.album].some((v) => v.toLowerCase().includes(q))
-      );
-    }
-    return list;
-  }
+  const inPlaylist = () => state.view.startsWith("pl:");
 
   function viewTitle() {
     if (state.view === "library") return "Libreria";
@@ -54,6 +41,7 @@
     return pl ? pl.name : "Playlist";
   }
 
+  // ---------- Rendering ----------
   function render() {
     $("view-title").textContent = viewTitle();
     document.querySelectorAll(".nav-btn").forEach((b) =>
@@ -78,7 +66,7 @@
       del.onclick = (e) => {
         e.stopPropagation();
         if (!confirm(`Eliminare "${pl.name}"?`)) return;
-        state.playlists = state.playlists.filter((p) => p.id !== pl.id);
+        state.playlists = L.deletePlaylist(state.playlists, pl.id);
         save("musicly.playlists", state.playlists);
         if (state.view === "pl:" + pl.id) state.view = "library";
         render();
@@ -101,7 +89,7 @@
       return;
     }
     const playingId = state.queue[state.index]?.id;
-    tracks.forEach((t) => {
+    tracks.forEach((t, i) => {
       const li = document.createElement("li");
       li.className = "track" + (t.id === playingId ? " playing" : "");
 
@@ -126,31 +114,31 @@
       fav.onclick = (e) => { e.stopPropagation(); toggleFavorite(t.id); };
 
       const add = document.createElement("button");
-      add.textContent = state.view.startsWith("pl:") ? "−" : "＋";
-      add.title = state.view.startsWith("pl:") ? "Rimuovi dalla playlist" : "Aggiungi a playlist";
+      add.textContent = inPlaylist() ? "−" : "＋";
+      add.title = inPlaylist() ? "Rimuovi dalla playlist" : "Aggiungi a playlist";
       add.onclick = (e) => {
         e.stopPropagation();
-        state.view.startsWith("pl:") ? removeFromPlaylist(t.id) : addToPlaylist(t.id);
+        inPlaylist() ? removeFromPlaylist(t.id) : addToPlaylist(t.id);
       };
 
       li.append(cover, info, fav, add);
-      li.onclick = () => playFrom(tracks, tracks.indexOf(t));
+      li.onclick = () => playFrom(tracks, i);
       ul.appendChild(li);
     });
   }
 
   // ---------- Preferiti e playlist ----------
   function toggleFavorite(id) {
-    const i = state.favorites.indexOf(id);
-    i === -1 ? state.favorites.push(id) : state.favorites.splice(i, 1);
+    state.favorites = L.toggleId(state.favorites, id);
     save("musicly.favorites", state.favorites);
     renderTracks();
   }
 
   function createPlaylist() {
     const name = prompt("Nome della nuova playlist:");
-    if (!name || !name.trim()) return;
-    state.playlists.push({ id: String(Date.now()), name: name.trim(), trackIds: [] });
+    const next = L.createPlaylist(state.playlists, name, Date.now());
+    if (next === state.playlists) return;
+    state.playlists = next;
     save("musicly.playlists", state.playlists);
     render();
   }
@@ -164,14 +152,12 @@
     const n = parseInt(prompt(`Aggiungi a quale playlist?\n${list}`), 10);
     const pl = state.playlists[n - 1];
     if (!pl) return;
-    if (!pl.trackIds.includes(trackId)) pl.trackIds.push(trackId);
+    state.playlists = L.addTrackToPlaylist(state.playlists, pl.id, trackId);
     save("musicly.playlists", state.playlists);
   }
 
   function removeFromPlaylist(trackId) {
-    const pl = state.playlists.find((p) => p.id === state.view.slice(3));
-    if (!pl) return;
-    pl.trackIds = pl.trackIds.filter((id) => id !== trackId);
+    state.playlists = L.removeTrackFromPlaylist(state.playlists, state.view.slice(3), trackId);
     save("musicly.playlists", state.playlists);
     renderTracks();
   }
@@ -191,6 +177,7 @@
     $("now-artist").textContent = t.artist;
     $("cover").style.background = t.cover;
     document.title = `${t.title} · Musicly`;
+    updateMediaSession(t);
     if (autoplay) audio.play().catch(() => {});
     renderTracks();
   }
@@ -205,25 +192,47 @@
   }
 
   function next(auto = false) {
-    if (!state.queue.length) return;
-    if (auto && state.repeat) { audio.currentTime = 0; audio.play(); return; }
-    if (state.shuffle) {
-      state.index = Math.floor(Math.random() * state.queue.length);
-    } else if (state.index < state.queue.length - 1) {
-      state.index++;
-    } else if (auto) {
-      return;                       // fine coda
-    } else {
-      state.index = 0;
-    }
+    const i = L.nextIndex({
+      index: state.index,
+      length: state.queue.length,
+      shuffle: state.shuffle,
+      repeat: state.repeat,
+      auto
+    });
+    if (i === -1) return;                     // fine coda
+    if (i === state.index && auto) { audio.currentTime = 0; audio.play(); return; }
+    state.index = i;
     loadCurrent(true);
   }
 
   function prev() {
     if (!state.queue.length) return;
     if (audio.currentTime > 3) { audio.currentTime = 0; return; }
-    state.index = (state.index - 1 + state.queue.length) % state.queue.length;
+    state.index = L.prevIndex({ index: state.index, length: state.queue.length });
     loadCurrent(true);
+  }
+
+  // ---------- Controlli di sistema (schermata di blocco, tasti multimediali) ----------
+  function updateMediaSession(t) {
+    if (!("mediaSession" in navigator)) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: t.title,
+      artist: t.artist,
+      album: t.album,
+      artwork: [{ src: "icons/icon-512.png", sizes: "512x512", type: "image/png" }]
+    });
+  }
+
+  if ("mediaSession" in navigator) {
+    const handlers = {
+      play: () => audio.play(),
+      pause: () => audio.pause(),
+      previoustrack: prev,
+      nexttrack: () => next(false)
+    };
+    for (const [action, fn] of Object.entries(handlers)) {
+      try { navigator.mediaSession.setActionHandler(action, fn); } catch {}
+    }
   }
 
   // ---------- Eventi ----------
@@ -248,10 +257,13 @@
   audio.addEventListener("play", () => ($("play").textContent = "⏸"));
   audio.addEventListener("pause", () => ($("play").textContent = "▶"));
   audio.addEventListener("ended", () => next(true));
-  audio.addEventListener("loadedmetadata", () => ($("duration").textContent = fmt(audio.duration)));
+  audio.addEventListener("loadedmetadata", () => ($("duration").textContent = L.formatTime(audio.duration)));
   audio.addEventListener("timeupdate", () => {
-    $("current").textContent = fmt(audio.currentTime);
+    $("current").textContent = L.formatTime(audio.currentTime);
     if (audio.duration) $("seek").value = (audio.currentTime / audio.duration) * 100;
+  });
+  audio.addEventListener("error", () => {
+    if (audio.src) $("now-artist").textContent = "Impossibile riprodurre (sei offline?)";
   });
 
   $("seek").oninput = (e) => {
@@ -266,6 +278,38 @@
     if (e.code === "ArrowRight" && e.shiftKey) next(false);
     if (e.code === "ArrowLeft" && e.shiftKey) prev();
   });
+
+  // ---------- Installazione (PWA) ----------
+  let installPrompt = null;
+  const installBtn = $("install");
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    installPrompt = e;
+    installBtn.hidden = false;
+  });
+
+  installBtn.onclick = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    installPrompt = null;
+    installBtn.hidden = true;
+  };
+
+  window.addEventListener("appinstalled", () => { installBtn.hidden = true; });
+
+  // ---------- Offline ----------
+  const updateOnline = () => document.body.classList.toggle("offline", !navigator.onLine);
+  window.addEventListener("online", updateOnline);
+  window.addEventListener("offline", updateOnline);
+  updateOnline();
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    });
+  }
 
   render();
 })();

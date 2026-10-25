@@ -4,6 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Musicly</title>
+  <meta name="description" content="Un'app di streaming musicale in stile Spotify">
+  <meta name="theme-color" content="#1db954">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Musicly">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -19,9 +28,11 @@
         <button id="new-playlist" title="Nuova playlist">＋</button>
       </div>
       <ul id="playlist-list"></ul>
+      <button id="install" class="install-btn" hidden>⬇ Installa app</button>
     </aside>
 
     <main class="main">
+      <div id="offline-banner" class="offline-banner">Sei offline: l'interfaccia funziona, ma i brani non si possono riprodurre.</div>
       <input id="search" type="search" placeholder="Cerca brani, artisti, album…" autocomplete="off">
       <h2 id="view-title">Libreria</h2>
       <ul id="track-list" class="track-list"></ul>
@@ -58,6 +69,7 @@
   </footer>
 
   <audio id="audio" preload="metadata"></audio>
+  <script src="lib.js"></script>
   <script src="tracks.js"></script>
   <script src="app.js"></script>
 </body>
